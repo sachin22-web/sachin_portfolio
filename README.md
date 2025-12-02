@@ -1,416 +1,332 @@
-# MERN Portfolio Application
+# Sachin Takoria – Full-Stack Portfolio (MERN)
 
-A full-featured portfolio application built with MERN stack (MongoDB, Express, React, Node.js) with admin panel for content management.
+A production-ready personal portfolio application with a full admin panel for managing projects, blogs, resume, experience, certifications, and contact enquiries.
 
-## Table of Contents
+## 🔗 Live Demo
 
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Environment Setup](#environment-setup)
-- [Installation](#installation)
-- [Running the Application](#running-the-application)
-- [Database Seeding](#database-seeding)
-- [API Documentation](#api-documentation)
-- [Admin Panel](#admin-panel)
-- [WhatsApp Integration](#whatsapp-integration)
+- 🌐 **Public Site:** https://sachintakoria.in/
+- 🔑 **Admin Panel:** https://sachintakoria.in/admin/login  
+  (Credentials are set via your own environment variables – not included here.)
 
-## Tech Stack
+---
+
+## ✨ Features
+
+### 👨‍💻 Public Portfolio
+
+- Hero section with intro & CTA buttons  
+- Dynamic **Projects** page with:
+  - Category-wise projects
+  - Detailed project pages (`/projects/:slug`)
+  - GitHub & Live Demo links
+- **About** page with professional summary
+- **Skills** page
+  - Grouped by Frontend / Backend / Tools / DevOps
+  - Clean, modern badges with icons
+- **Experience** & **Certifications** pages
+- **Blogs**:
+  - Blog listing (`/blogs`)
+  - Blog details by slug (`/blog/:slug`)
+- **Resume** page:
+  - View/download resume from admin-managed content
+- **Contact** page:
+  - Validated contact form
+  - Sends enquiry to backend
+  - WhatsApp integration via API (configurable)
+- PWA Ready:
+  - `PWAInstallButton` for “Add to Home Screen”
+  - Works nicely on mobile
+- Floating **WhatsApp widget** for quick contact
+- Dark/Light **Theme switcher**
+- Fully responsive (mobile, tablet, desktop)
+
+### 🛠 Admin Panel
+
+All admin routes are protected using JWT and a `ProtectedRoute` wrapper in frontend.
+
+- **Admin Login:** `/admin/login`
+- **Dashboard:** `/admin`
+  - Stats: total projects, featured projects, total messages, etc.
+  - Quick action shortcuts
+
+#### Admin Modules
+
+- **Projects Management** – `/admin/projects`
+  - List, search, filter projects
+  - Create / Edit / Delete projects
+  - Fields: title, short description, long description, category, tech stack, GitHub URL, live URL, featured flag, etc.
+
+- **Content Management** – `/admin/content`
+  - Manage hero text, about, contact info, and other CMS content keys
+
+- **Messages** – `/admin/messages`
+  - View contact form submissions
+  - Status / read tracking
+
+- **Resume** – `/admin/resume`
+  - Upload/update resume link & related text
+
+- **Experience** – `/admin/experience`
+  - Manage timeline items (company, role, duration, description)
+
+- **Certifications** – `/admin/certifications`
+  - Manage certificates list (title, issuer, link, year)
+
+- **Blogs** – `/admin/blogs`
+  - Create / edit / delete blog posts
+  - Slug support for SEO-friendly URLs
+
+- **Theme Settings** – `/admin/theme`
+  - Customize theme / branding content (logo/text etc. as implemented)
+
+---
+
+## 🧰 Tech Stack
 
 ### Frontend
-- **React 18** with TypeScript
-- **Vite** for fast builds
-- **Tailwind CSS** for styling
-- **shadcn/ui** for UI components
-- **Framer Motion** for animations
-- **React Router** for navigation
-- **React Query** for data fetching
-- **React Hook Form** for form handling
-- **Zod** for schema validation
+
+- **React** + **TypeScript**
+- **Vite**
+- **React Router DOM**
+- **Tailwind CSS**
+- **shadcn/ui** (Radix UI based components)
+- **React Hook Form** + **Zod** (form + validation)
+- **TanStack Query (@tanstack/react-query)** for data fetching
+- **Framer Motion** for subtle animations
+- **Lucide-react** icons
 
 ### Backend
-- **Node.js** with Express.js
-- **MongoDB Atlas** for database
-- **Mongoose** for ODM
-- **JWT** for authentication
+
+- **Node.js** + **Express**
+- **MongoDB** + **Mongoose**
+- **JWT Authentication**
 - **bcrypt** for password hashing
-- **Zod** for request validation
-- **CORS** for cross-origin requests
-- **Morgan** for logging
-- **Express Rate Limit** for rate limiting
+- **Zod** for validation
+- **CORS**, **morgan** for logging
+- **express-rate-limit** for rate limiting (e.g., contact endpoint)
+- **pdf-parse** (for resume-related processing if enabled)
 
-## Project Structure
+### Other
 
-```
+- **TypeScript** for backend
+- ESLint + Prettier config for clean code
+- Supabase config folder (optional, used only if you wire it in)
+
+---
+
+## 📂 Project Structure
+
+High-level structure (relevant parts):
+
+```bash
 .
-├── client/                 # Frontend application
+├── src/                     # Frontend (React + Vite + TS)
+│   ├── components/          # Reusable components + UI
+│   ├── pages/               # Page components (Home, About, Projects, Admin, etc.)
+│   ├── contexts/            # Theme & other contexts
+│   ├── lib/                 # Helpers, API client, etc.
+│   └── App.tsx              # Route definitions
+│
+├── server/                  # Backend (Node + Express + TS)
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── pages/         # Page components
-│   │   ├── hooks/         # Custom React hooks
-│   │   ├── lib/           # Utility functions
-│   │   └── App.tsx        # Main app component
-│   └── package.json
-├── server/                 # Backend application
-│   ├── src/
-│   │   ├── config/        # Configuration files
-│   │   ├── models/        # Mongoose models
-│   │   ├── routes/        # API routes
-│   │   ├── middleware/    # Express middleware
-│   │   ├── services/      # Business logic
-│   │   ├── validation/    # Zod schemas
-│   │   ├── utils/         # Utility functions
-│   │   ├── seeds/         # Database seeds
-│   │   └── index.ts       # Server entry point
-│   └── package.json
-└── README.md
-```
+│   │   ├── config/          # DB config
+│   │   ├── models/          # Mongoose models (AdminUser, Project, Blog, etc.)
+│   │   ├── routes/          # API routes (auth, projects, content, messages...)
+│   │   ├── middleware/      # auth, error handler, rate limiter
+│   │   ├── services/        # Business logic
+│   │   ├── validation/      # Zod schemas
+│   │   └── seeds/           # Seed scripts (default admin, sample data)
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── public/                  # Static assets for frontend
+├── supabase/                # Supabase config/migrations (optional)
+├── .env.example             # Example root env
+├── server/.env.example      # Example backend env (if present)
+├── package.json             # Frontend/root scripts & deps
+└── README.md                # Project documentation (this file)
+✅ Prerequisites
+Node.js v18+
 
-## Features
+npm or pnpm or yarn (README assumes npm)
 
-### Public Features
-- **Home Page**: Hero section, featured projects, tech stack showcase
-- **Projects Showcase**: Filterable grid by category, detailed project views
-- **Project Details**: Full Markdown support with images, GIFs, code blocks, YouTube links
-- **About Section**: Professional summary and highlights
-- **Skills Section**: Organized by frontend, backend, and DevOps
-- **Contact Form**: Message submission with WhatsApp notification (optional)
-- **Responsive Design**: Mobile-first, works on all devices
-- **Animations**: Smooth Framer Motion transitions
+MongoDB Atlas (or any reachable MongoDB instance)
 
-### Admin Panel
-- **Authentication**: Secure login with JWT tokens
-- **Dashboard**: Statistics overview (projects, featured, messages)
-- **Projects Management**: CRUD operations with slug auto-generation
-- **Content Management**: CMS-style editing for all sections (Hero, About, Skills, Banners, Contact, Social)
-- **Message Management**: View contact form enquiries with quick WhatsApp reply option
-- **Markdown Editor**: Full support for READMEs with images and code blocks
+🔐 Environment Variables
+⚠️ Do NOT commit real secrets. Use .env files locally and environment variables in production.
 
-## Prerequisites
+Root .env (optional, if you centralize some vars)
+You can keep it minimal or skip this if you prefer only server .env.
 
-- **Node.js** >= 18.0.0
-- **npm** or **yarn**
-- **MongoDB Atlas** account (free tier available)
-- **Git**
-
-## Environment Setup
-
-### MongoDB Atlas Setup
-1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Create a new cluster
-3. Create a database user with a strong password
-4. Get your connection string (replace `<user>`, `<password>`, `<cluster>`)
-
-### WhatsApp Cloud API (Optional)
-To enable WhatsApp notifications for contact form submissions:
-1. Get access to [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)
-2. Create a phone number ID
-3. Generate an access token
-4. Add environment variables (see below)
-
-## Installation
-
-### 1. Clone the Repository
-```bash
-git clone <repository-url>
-cd portfolio-app
-```
-
-### 2. Install Backend Dependencies
-```bash
-cd server
-npm install
-```
-
-### 3. Setup Backend Environment
-Create a `.env` file in the `server` directory:
-
-```env
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/portfolio
+Backend – server/.env
+env
+Copy code
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
 JWT_SECRET=your-super-secret-jwt-key
-ADMIN_DEFAULT_EMAIL=sachintakoria2204@gmail.com
-ADMIN_DEFAULT_PASSWORD=Sachin@123
-WHATSAPP_TO_NUMBER=7015242844
+
+ADMIN_DEFAULT_EMAIL=admin@example.com
+ADMIN_DEFAULT_PASSWORD=YourStrongAdminPassword123
+
+WHATSAPP_TO_NUMBER=91xxxxxxxxxx
 WHATSAPP_API_KEY=your-whatsapp-api-key
 WHATSAPP_PHONE_NUMBER_ID=your-phone-number-id
+
 PORT=5000
 NODE_ENV=development
 CORS_ORIGIN=http://localhost:5173
-```
+Replace all placeholder values (<username>, <password>, your-super-secret-jwt-key, etc.) with your own secure values.
 
-**Important**: Never commit `.env` files with secrets.
+Frontend – client/.env.local or root .env for Vite
+If you use a separate client env file:
 
-### 4. Install Frontend Dependencies
-```bash
-cd ../client
-npm install
-```
-
-### 5. Setup Frontend Environment
-Create a `.env.local` file in the `client` directory:
-
-```env
+env
+Copy code
 VITE_API_BASE_URL=http://localhost:5000
-```
+In production (for https://sachintakoria.in), set it to your backend URL, e.g.:
 
-## Running the Application
+env
+Copy code
+VITE_API_BASE_URL=https://api.yourdomain.com
+(Adjust according to your hosting setup.)
 
-### Development Mode
+🚀 Local Development
+1. Clone the Repository
+bash
+Copy code
+git clone <your-repo-url>.git
+cd <your-project-folder>
+2. Install Frontend Dependencies
+From project root:
 
-**Terminal 1 - Backend Server:**
-```bash
+bash
+Copy code
+npm install
+3. Install Backend Dependencies
+bash
+Copy code
 cd server
-npm run dev
-```
-Server runs on `http://localhost:5000`
+npm install
+cd ..
+4. Configure Environment
+Copy .env.example → .env files where needed.
 
-**Terminal 2 - Frontend App:**
-```bash
-cd client
-npm run dev
-```
-Frontend runs on `http://localhost:5173`
+Set MONGODB_URI, JWT_SECRET, admin email/password, WhatsApp keys (if using that feature), and VITE_API_BASE_URL.
 
-### Production Build
+5. Seed the Database (Optional but Recommended)
+Create default admin user and sample content:
 
-**Backend:**
-```bash
-cd server
-npm run build
-npm start
-```
-
-**Frontend:**
-```bash
-cd client
-npm run build
-npm run preview
-```
-
-## Database Seeding
-
-Seed the database with sample data:
-
-```bash
+bash
+Copy code
 cd server
 npm run seed
-```
+cd ..
+6. Run Backend (Dev Mode)
+bash
+Copy code
+cd server
+npm run dev
+Backend will typically run on: http://localhost:5000
 
-This will:
-- Create a default admin user with credentials from env variables
-- Insert 3 sample projects
-- Setup 6 content sections (hero, about, skills, contact, social, banners)
+7. Run Frontend (Dev Mode)
+In a separate terminal, from project root:
 
-### Default Admin Credentials
-- **Email**: `sachintakoria2204@gmail.com`
-- **Password**: `Sachin@123`
+bash
+Copy code
+npm run dev
+Frontend will run on something like: http://localhost:5173
 
-Change these immediately in the admin panel after first login.
+🔁 Run Frontend & Backend Together
+From root:
 
-## API Documentation
+bash
+Copy code
+npm run dev:full
+This uses concurrently to run both frontend and backend dev servers.
 
-### Authentication
-All admin endpoints require JWT token in `Authorization` header:
-```
-Authorization: Bearer <token>
-```
+🧩 API Overview
+All APIs are prefixed with /api.
 
-### Public Endpoints
+Public Endpoints
+GET /api/projects – List all public projects
 
-#### Projects
-- `GET /api/projects` - List all projects (sorted by display_order)
-- `GET /api/projects/:slug` - Get project details
+GET /api/content/:key – Get CMS content by key (e.g. hero, about, contact info)
 
-#### Content
-- `GET /api/content/:key` - Get content section (hero, about, skills, banners, contact, social)
+POST /api/contact – Submit a contact enquiry
 
-#### Messages
-- `POST /api/contact` - Submit contact form (rate-limited to 5 per minute per IP)
+GET /api/resumes – Get resume data
 
-### Admin Endpoints
+GET /api/experience – Get experience timeline
 
-#### Authentication
-- `POST /api/admin/auth/login` - Login with email/password
+GET /api/certifications – Get certifications list
 
-#### Projects
-- `POST /api/admin/projects` - Create new project
-- `PUT /api/admin/projects/:id` - Update project
-- `DELETE /api/admin/projects/:id` - Delete project
+GET /api/blogs – Get blogs listing
 
-#### Content
-- `PUT /api/admin/content/:key` - Update content section
+GET /api/blogs/:slug – Get blog by slug (depending on route implementation)
 
-#### Messages
-- `GET /api/admin/messages` - List all enquiries (paginated, latest first)
+Admin Endpoints (JWT Protected)
+POST /api/admin/auth/login – Login admin & receive JWT
 
-## Admin Panel
+GET /api/admin/projects – List projects
 
-Access the admin panel at `http://localhost:5173/admin/login`
+POST /api/admin/projects – Create project
 
-### Admin Pages
+PUT /api/admin/projects/:id – Update project
 
-1. **Dashboard** (`/admin`)
-   - Overview statistics
-   - Quick access to main features
+DELETE /api/admin/projects/:id – Delete project
 
-2. **Projects** (`/admin/projects`)
-   - List all projects with filters and search
-   - Create/Edit/Delete projects
-   - Auto-generate unique slugs
+PUT /api/admin/content/:key – Update content
 
-3. **Content** (`/admin/content`)
-   - 6 editable sections (tabs)
-   - Hero: title, subtitle, CTAs
-   - About: summary, highlights
-   - Skills: frontend, backend, DevOps
-   - Banners: carousel items with order
-   - Contact: email, phone, address, WhatsApp number
-   - Social: links to social profiles
+GET /api/admin/messages – List contact form messages
 
-4. **Messages** (`/admin/messages`)
-   - View all contact form submissions
-   - Quick copy email
-   - Direct WhatsApp reply button
+GET /api/admin/resumes / POST /api/admin/resumes – Manage resumes
 
-## WhatsApp Integration
+GET /api/admin/experience / POST/PUT/DELETE – Manage experience
 
-### Setup WhatsApp Cloud API
+GET /api/admin/certifications / POST/PUT/DELETE – Manage certifications
 
-1. **Get WhatsApp Business Account**
-   - Visit [Facebook Business Suite](https://business.facebook.com)
-   - Create a WhatsApp Business Account
+GET /api/admin/blogs / POST/PUT/DELETE – Manage blogs
 
-2. **Create Phone Number ID**
-   - Register a phone number in WhatsApp Manager
-   - Note the Phone Number ID
+(Exact payloads and responses are defined in the Zod validation schemas in server/src/validation/.)
 
-3. **Generate Access Token**
-   - Go to [App Dashboard](https://developers.facebook.com)
-   - Create a new app or use existing one
-   - Create an access token with `whatsapp_business_messaging` permission
-   - Note: Token expires, set up token refresh process
+🧪 Production Build
+Build Frontend
+bash
+Copy code
+npm run build
+This will generate a production build of the React app in dist/.
 
-4. **Add to Environment**
-   ```env
-   WHATSAPP_API_KEY=your-access-token
-   WHATSAPP_PHONE_NUMBER_ID=your-phone-number-id
-   WHATSAPP_TO_NUMBER=recipient-phone-number (with country code)
-   ```
+Backend (Production)
+bash
+Copy code
+cd server
+npm run build    # Compiles TypeScript → dist
+npm start        # Runs dist/index.js
+Set all necessary environment variables on your server / hosting provider (no real secrets in Git).
 
-### Message Format
-When a contact form is submitted, WhatsApp message includes:
-- Sender name
-- Sender email
-- Subject
-- First 200 characters of message
+🔒 Security Notes
+Do NOT commit .env files or real credentials to Git.
 
-If WhatsApp credentials are missing, messages are still saved but no notification is sent.
+Use strong, unique values for:
 
-## Features Deep Dive
+JWT_SECRET
 
-### Project Slug Generation
-- Automatic slug generation from title (kebab-case)
-- Unique slug enforcement with numeric suffixes
-- Example: "My Awesome Project" → "my-awesome-project"
+ADMIN_DEFAULT_PASSWORD
 
-### Markdown Support in Project README
-- Headings (H1-H6)
-- Lists (ordered, unordered)
-- Code blocks with syntax highlighting
-- Links and images
-- YouTube embeds (via links)
-- GIFs (via image URLs)
-- Tables
-- Bold, italic, strikethrough
+API keys (WhatsApp etc.)
 
-Example:
-```markdown
-# Project Title
+Rotate credentials regularly for production deployments.
 
-## Description
-This is an awesome project.
+📌 TODO / Ideas (Optional)
+Add rate-limited public blog RSS feed
 
-### Tech Stack
-- React
-- TypeScript
-- MongoDB
+Add project tags & filters on frontend
 
-[Live Demo](https://example.com)
-[GitHub](https://github.com/example)
+Integrate analytics (e.g., Plausible, Google Analytics)
 
-![Screenshot](https://example.com/image.jpg)
-```
+Add multi-language support (EN / HI)
 
-### Rate Limiting
-Contact form endpoint is rate-limited to prevent spam:
-- **Limit**: 5 requests per minute per IP
-- **Response**: 429 Too Many Requests
+🙌 Credits
+Built as a full-stack MERN portfolio and CMS for Sachin Takoria.
+Frontend + Backend both are custom built and deployed at:
 
-### Authentication Flow
-1. User submits credentials to `/api/admin/auth/login`
-2. Server validates credentials and returns JWT token
-3. Token stored in localStorage (client-side)
-4. Token sent with every admin request in Authorization header
-5. Server verifies token on protected routes
-6. Invalid/expired tokens return 401 Unauthorized
-
-## Troubleshooting
-
-### MongoDB Connection Error
-- Verify connection string in `.env`
-- Check IP whitelist in MongoDB Atlas (add your IP)
-- Ensure username and password are URL-encoded
-
-### Port Already in Use
-- Backend default: 5000
-- Frontend default: 5173
-- Change via environment variables or command flags
-
-### CORS Errors
-- Ensure `CORS_ORIGIN` matches your frontend URL
-- Default: `http://localhost:5173`
-
-### Admin Login Fails
-- Verify credentials in `.env`
-- Check if database is seeded (`npm run seed`)
-- Check server logs for errors
-
-## Building and Deployment
-
-### Frontend Deployment
-1. Build: `npm run build`
-2. Output in `dist/` directory
-3. Deploy to Netlify, Vercel, or any static host
-
-### Backend Deployment
-1. Build: `npm run build`
-2. Set environment variables on hosting platform
-3. Deploy to Heroku, Railway, AWS, or similar
-
-Example with Netlify (frontend) and Railway (backend):
-```
-VITE_API_BASE_URL=https://api.example.com
-```
-
-## License
-
-MIT
-
-## Support
-
-For issues or questions:
-1. Check error logs
-2. Review API documentation
-3. Verify environment variables
-4. Check MongoDB Atlas connection
-
-## Future Enhancements
-
-- [ ] Resume PDF parsing and auto-population
-- [ ] Email notifications for contact forms
-- [ ] Analytics dashboard
-- [ ] Dark mode toggle
-- [ ] Multi-language support
-- [ ] SEO optimization
-- [ ] Performance monitoring
+https://sachintakoria.in/
